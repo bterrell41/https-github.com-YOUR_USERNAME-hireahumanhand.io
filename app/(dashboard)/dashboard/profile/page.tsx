@@ -107,6 +107,36 @@ export default async function ProfileSettings() {
                                 </div>
                             </div>
                         </div>
+
+                        {/* Crypto Wallets */}
+                        <div className="space-y-4">
+                            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Crypto Wallets</h3>
+                            <div className="bg-white dark:bg-card-dark rounded-xl border border-slate-200 dark:border-slate-800 p-4 space-y-4 shadow-sm">
+                                <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">
+                                    Receive payments directly to your wallet.
+                                </p>
+                                <div className="space-y-1">
+                                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400">Ethereum Address (ETH)</label>
+                                    <input
+                                        type="text"
+                                        name="eth_address"
+                                        defaultValue={profile.wallet_addresses?.eth || ''}
+                                        placeholder="0x..."
+                                        className="w-full bg-slate-100 dark:bg-slate-900 border-none rounded-lg px-3 py-2 text-sm font-mono focus:ring-2 focus:ring-primary/50 text-slate-900 dark:text-white"
+                                    />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400">Bitcoin Address (BTC)</label>
+                                    <input
+                                        type="text"
+                                        name="btc_address"
+                                        defaultValue={profile.wallet_addresses?.btc || ''}
+                                        placeholder="bc1..."
+                                        className="w-full bg-slate-100 dark:bg-slate-900 border-none rounded-lg px-3 py-2 text-sm font-mono focus:ring-2 focus:ring-primary/50 text-slate-900 dark:text-white"
+                                    />
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </main>
             </form>

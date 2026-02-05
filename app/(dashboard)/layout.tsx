@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Logo } from "@/components/shared/Logo"
-import { LayoutDashboard, MessageSquare, User, CreditCard, LogOut, Settings, Activity } from "lucide-react"
+import { LayoutDashboard, MessageSquare, User, CreditCard, LogOut, Settings, Activity, Camera, Wallet } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 export default function DashboardLayout({
@@ -47,6 +47,20 @@ export default function DashboardLayout({
                         <Button variant="ghost" className="w-full justify-start gap-3 text-muted-foreground hover:text-primary hover:bg-primary/10">
                             <MessageSquare className="w-4 h-4" />
                             Messages
+                        </Button>
+                    </Link>
+
+                    <Link href="/dashboard/photos">
+                        <Button variant="ghost" className="w-full justify-start gap-3 text-muted-foreground hover:text-primary hover:bg-primary/10">
+                            <Camera className="w-4 h-4" />
+                            Photos
+                        </Button>
+                    </Link>
+
+                    <Link href="/dashboard/payments">
+                        <Button variant="ghost" className="w-full justify-start gap-3 text-muted-foreground hover:text-primary hover:bg-primary/10">
+                            <Wallet className="w-4 h-4" />
+                            Payments
                         </Button>
                     </Link>
 

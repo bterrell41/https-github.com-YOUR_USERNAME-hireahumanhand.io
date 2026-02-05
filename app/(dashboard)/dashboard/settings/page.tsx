@@ -1,11 +1,27 @@
-"use client"
-
+import { createServerSupabaseClient } from '@/lib/db/supabase-server'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { CheckCircle2, CreditCard, Shield } from "lucide-react"
+import { CheckCircle2, CreditCard, Shield, AlertTriangle } from "lucide-react"
+import { redirect } from 'next/navigation'
+import Link from 'next/link'
 
-export default function SettingsPage() {
+export default async function SettingsPage() {
+    const supabase = await createServerSupabaseClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+        redirect('/login')
+    }
+
+    const { data: profile } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', user.id)
+        .single()
+
+    const isVerified = profile?.verification_status === 'verified'
+
     return (
         <div className="space-y-8">
             <div className="space-y-1">
@@ -16,39 +32,59 @@ export default function SettingsPage() {
             <div className="grid gap-8 lg:grid-cols-2">
 
                 {/* Verification Status */}
-                <Card className="border-primary/20 bg-primary/5">
+                <Card className={`border-primary/20 ${isVerified ? 'bg-primary/5' : 'bg-card/50'}`}>
                     <CardHeader>
                         <div className="flex items-center gap-2">
-                            <Shield className="h-5 w-5 text-primary" />
+                            <Shield className={`h-5 w-5 ${isVerified ? 'text-primary' : 'text-muted-foreground'}`} />
                             <CardTitle>Verification Status</CardTitle>
                         </div>
                         <CardDescription>Your current identity status on the protocol.</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <div className="flex items-center gap-4 p-4 border border-primary/20 bg-primary/10 rounded-lg">
-                            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                                <CheckCircle2 className="h-6 w-6" />
+                        {isVerified ? (
+                            <div className="flex items-center gap-4 p-4 border border-primary/20 bg-primary/10 rounded-lg">
+                                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                                    <CheckCircle2 className="h-6 w-6" />
+                                </div>
+                                <div>
+                                    <h4 className="font-bold">Verified Human</h4>
+                                    <p className="text-sm text-muted-foreground">Tier: <span className="text-primary font-mono uppercase">{profile.verification_tier || 'basic'}</span></p>
+                                </div>
                             </div>
-                            <div>
-                                <h4 className="font-bold">Verified Human</h4>
-                                <p className="text-sm text-muted-foreground">Tier: <span className="text-primary font-mono">PRO</span></p>
+                        ) : (
+                            <div className="flex items-center gap-4 p-4 border border-yellow-500/20 bg-yellow-500/10 rounded-lg">
+                                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-yellow-500/20 text-yellow-500">
+                                    <AlertTriangle className="h-6 w-6" />
+                                </div>
+                                <div>
+                                    <h4 className="font-bold">Not Verified</h4>
+                                    <p className="text-sm text-muted-foreground">Verify to unlock more jobs.</p>
+                                </div>
                             </div>
-                        </div>
+                        )}
+
                         <ul className="space-y-2 text-sm">
-                            <li className="flex items-center gap-2">
-                                <CheckCircle2 className="h-4 w-4 text-primary" />
+                            <li className={`flex items-center gap-2 ${isVerified ? '' : 'text-muted-foreground/50'}`}>
+                                <CheckCircle2 className={`h-4 w-4 ${isVerified ? 'text-primary' : ''}`} />
                                 <span>Visible to HHC Protocol Agents</span>
                             </li>
-                            <li className="flex items-center gap-2">
-                                <CheckCircle2 className="h-4 w-4 text-primary" />
+                            <li className={`flex items-center gap-2 ${isVerified ? '' : 'text-muted-foreground/50'}`}>
+                                <CheckCircle2 className={`h-4 w-4 ${isVerified ? 'text-primary' : ''}`} />
                                 <span>Priority Ranking in Search</span>
                             </li>
-                            <li className="flex items-center gap-2">
-                                <CheckCircle2 className="h-4 w-4 text-primary" />
+                            <li className={`flex items-center gap-2 ${isVerified ? '' : 'text-muted-foreground/50'}`}>
+                                <CheckCircle2 className={`h-4 w-4 ${isVerified ? 'text-primary' : ''}`} />
                                 <span>Blue Checkmark Badge</span>
                             </li>
                         </ul>
                     </CardContent>
+                    {!isVerified && (
+                        <CardFooter>
+                            <Link href="/verify" className="w-full">
+                                <Button className="w-full">Get Verified Now</Button>
+                            </Link>
+                        </CardFooter>
+                    )}
                 </Card>
 
                 {/* Subscription Plan */}
@@ -66,14 +102,22 @@ export default function SettingsPage() {
                                 <p className="font-medium">Human Hand Clearance Pro</p>
                                 <p className="text-sm text-muted-foreground">$9.99 / month</p>
                             </div>
-                            <Badge variant="outline" className="border-green-500/50 text-green-500">Active</Badge>
+                            {isVerified ?
+                                <Badge variant="outline" className="border-green-500/50 text-green-500">Active</Badge>
+                                :
+                                <Badge variant="outline" className="border-muted text-muted-foreground">Inactive</Badge>
+                            }
                         </div>
-                        <div className="text-sm text-muted-foreground">
-                            Next billing date: <strong>March 14, 2026</strong>
-                        </div>
+                        {isVerified && (
+                            <div className="text-sm text-muted-foreground">
+                                Status: <strong>Active</strong>
+                            </div>
+                        )}
                     </CardContent>
                     <CardFooter className="border-t border-border/50 pt-4">
-                        <Button variant="outline" className="w-full">Manage Subscription</Button>
+                        <Link href="/verify" className="w-full">
+                            <Button variant="outline" className="w-full">Manage Subscription</Button>
+                        </Link>
                     </CardFooter>
                 </Card>
 

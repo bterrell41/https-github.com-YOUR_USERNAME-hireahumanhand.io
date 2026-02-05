@@ -21,6 +21,20 @@ export async function updateProfile(formData: FormData) {
     const skillsString = formData.get('skills') as string
     const skills = skillsString ? skillsString.split(',').map(s => s.trim()).filter(Boolean) : []
 
+    const eth_address = formData.get('eth_address') as string
+    const btc_address = formData.get('btc_address') as string
+
+    // Store as a simple JSON object for now, or the array format specified in schema comment
+    // Schema comment said: -- [{ chain, address }]
+    // Let's stick to a simple object for easier retrieval: { eth: "...", btc: "..." }
+    // OR strictly follow array if intended for future expansion. 
+    // Let's use the object map for simplicity in this MVP action, 
+    // effectively replacing the whole jsonb value.
+    const wallet_addresses = {
+        eth: eth_address,
+        btc: btc_address
+    }
+
     const { error } = await supabase
         .from('users')
         .update({
@@ -28,6 +42,7 @@ export async function updateProfile(formData: FormData) {
             bio,
             rate_hourly,
             skills,
+            wallet_addresses,
             updated_at: new Date().toISOString()
         })
         .eq('id', user.id)
