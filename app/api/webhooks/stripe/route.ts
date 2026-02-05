@@ -1,7 +1,7 @@
 
 import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/db/supabase'
+import { createServerSupabaseClient } from '@/lib/db/supabase-server'
 
 // Placeholder for Stripe library since we don't have keys yet
 // import Stripe from 'stripe'
@@ -9,7 +9,8 @@ import { createClient } from '@/lib/db/supabase'
 
 export async function POST(req: Request) {
     const body = await req.text()
-    const signature = headers().get('Stripe-Signature') as string
+    const headerStore = await headers()
+    const signature = headerStore.get('Stripe-Signature') as string
 
     let event;
 
@@ -23,7 +24,7 @@ export async function POST(req: Request) {
         return new NextResponse(`Webhook Error: ${error.message}`, { status: 400 })
     }
 
-    const supabase = createClient()
+    const supabase = await createServerSupabaseClient()
 
     // Handle the event
     switch (event.type) {

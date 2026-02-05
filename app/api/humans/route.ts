@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/db/supabase'
+import { createServerSupabaseClient } from '@/lib/db/supabase-server'
 import { NextResponse } from 'next/server'
 
 export async function GET(request: Request) {
@@ -16,7 +16,7 @@ export async function GET(request: Request) {
         return NextResponse.json({ success: true, data: humans.slice(0, limit) })
     }
 
-    const supabase = createClient()
+    const supabase = await createServerSupabaseClient()
     let query = supabase.from('users').select('*').limit(limit)
 
     if (skill) query = query.contains('skills', [skill])

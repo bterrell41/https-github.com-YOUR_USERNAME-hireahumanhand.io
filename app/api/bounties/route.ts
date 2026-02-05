@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/db/supabase'
+import { createServerSupabaseClient } from '@/lib/db/supabase-server'
 import { NextResponse } from 'next/server'
 
 export async function GET(request: Request) {
@@ -13,7 +13,7 @@ export async function GET(request: Request) {
         return NextResponse.json({ success: true, data: bounties })
     }
 
-    const supabase = createClient()
+    const supabase = await createServerSupabaseClient()
     let query = supabase.from('bounties').select('*').eq('status', status)
 
     if (category) query = query.eq('category', category)
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
         }, { status: 400 })
     }
 
-    const supabase = createClient()
+    const supabase = await createServerSupabaseClient()
     const { data, error } = await supabase.from('bounties').insert(body).select().single()
 
     if (error) {
