@@ -4,10 +4,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Wallet, Bitcoin, ArrowUpRight, ArrowDownLeft, DollarSign } from "lucide-react"
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 
 export default async function PaymentsPage() {
     const supabase = await createServerSupabaseClient()
     const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+        redirect('/login')
+    }
 
     const { data: profile } = await supabase
         .from('users')

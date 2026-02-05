@@ -2,10 +2,15 @@ import { createServerSupabaseClient } from '@/lib/db/supabase-server'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Upload, Image as ImageIcon, Trash2 } from "lucide-react"
+import { redirect } from 'next/navigation'
 
 export default async function PhotosPage() {
     const supabase = await createServerSupabaseClient()
     const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+        redirect('/login')
+    }
 
     // Mock photos for MVP since we don't have storage buckets set up yet
     // In real implementation, this would query supabase.storage
