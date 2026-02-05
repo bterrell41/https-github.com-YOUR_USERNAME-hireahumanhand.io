@@ -1,5 +1,6 @@
 
 import Link from 'next/link'
+import { startConversation } from '@/app/(dashboard)/dashboard/messages/actions'
 
 export type Human = {
     id: string
@@ -42,7 +43,7 @@ export function HumanCard({ human }: { human: Human }) {
                     style={{ backgroundImage: `url("${human.avatar_url}")` }}
                 />
             </div>
-            
+
             <div className="flex flex-wrap gap-2">
                 {human.skills.slice(0, 3).map((skill) => (
                     <div key={skill} className="flex h-7 items-center rounded-lg bg-slate-200 dark:bg-white/5 px-3">
@@ -51,14 +52,17 @@ export function HumanCard({ human }: { human: Human }) {
                 ))}
             </div>
 
+
             <div className="flex items-center justify-between mt-2 pt-4 border-t border-white/5">
                 <div className="flex flex-col">
                     <span className="text-[10px] uppercase tracking-wider text-[#9da9b9] font-bold">Hourly Rate</span>
                     <p className="text-xl font-bold text-primary">${human.rate_hourly.toFixed(2)}</p>
                 </div>
-                <button className="bg-primary text-white font-bold py-2 px-6 rounded-lg text-sm shadow-lg shadow-primary/20 hover:bg-primary/90 transition-colors">
-                    Hire Human
-                </button>
+                <form action={startConversation.bind(null, human.id)}>
+                    <button type="submit" className="bg-primary text-white font-bold py-2 px-6 rounded-lg text-sm shadow-lg shadow-primary/20 hover:bg-primary/90 transition-colors">
+                        Hire Human
+                    </button>
+                </form>
             </div>
         </div>
     )

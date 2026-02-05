@@ -1,6 +1,20 @@
 import Link from 'next/link'
+import { createServerSupabaseClient } from '@/lib/db/supabase-server'
 
-export default function VerifyPage() {
+export default async function VerifyPage() {
+    // Get current user to attach to the payment
+    const supabase = await createServerSupabaseClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    // 1. If user is logged in, we attach their ID to the payment link
+    // 2. If not, we point them to login
+    const stripeUrl = "https://buy.stripe.com/fZufZieh11e2bWX8aQ1ZS0h"
+    const finalUrl = user
+        ? `${stripeUrl}?client_reference_id=${user.id}`
+        : "/login?next=/verify"
+
+    const buttonText = user ? "Get Verified Now" : "Log in to Verify"
+
     return (
         <div className="bg-background text-foreground min-h-screen font-display pb-24 relative overflow-hidden">
             {/* Background Decor */}
@@ -67,12 +81,12 @@ export default function VerifyPage() {
                         <p className="text-slate-500 text-xs mb-6">One-time payment. No monthly fees.</p>
 
                         <a
-                            href="https://buy.stripe.com/fZufZieh11e2bWX8aQ1ZS0h"
+                            href={finalUrl}
                             className="group relative flex items-center justify-center w-full h-14 bg-white text-black rounded-xl font-bold text-lg overflow-hidden transition-all hover:scale-[1.02] active:scale-[0.98]"
                         >
                             <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-black/5 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
                             <span className="relative z-10 flex items-center gap-2">
-                                Get Verified Now
+                                {buttonText}
                                 <span className="material-symbols-outlined">arrow_forward</span>
                             </span>
                         </a>
